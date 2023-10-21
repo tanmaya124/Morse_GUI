@@ -1,0 +1,72 @@
+# Import necessary libraries
+import tkinter as tk
+import tkinter.font as tkFont
+import RPi.GPIO as GPIO
+import time
+
+# Suppress GPIO warnings
+GPIO.setwarnings(False)
+
+# Set the GPIO mode to BOARD
+GPIO.setmode(GPIO.BOARD)
+
+# Initialize GPIO pins for LEDs
+GPIO.setup(8, GPIO.OUT)   # Initialize the blue LED.
+GPIO.setup(10, GPIO.OUT)  # Initialize the green LED.
+GPIO.setup(12, GPIO.OUT)  # Initialize the red LED.
+
+# Create a tkinter window
+win = tk.Tk()
+win.title("Morse Code Converter")  # Set the window title
+myFont = tkFont.Font(family='Helvetica', size=13, weight="bold")
+
+# Define a function to blink the blue LED for a dot
+def dot():
+    GPIO.output(8, GPIO.HIGH)
+    time.sleep(1)
+    GPIO.output(8, GPIO.LOW)
+    time.sleep(1)
+
+# Define a function to blink the green LED for a dash
+def dash():
+    GPIO.output(10, GPIO.HIGH)
+    time.sleep(1)
+    GPIO.output(10, GPIO.LOW)
+    time.sleep(1)
+
+# Define the Morse code for all the alphabets
+MORSE = {'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 'F': '..-.',
+         'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+         'M': '--', 'N': '-.', 'O': '---', 'P': '.--.', 'Q': '--.-', 'R': '.-.',
+         'S': '...', 'T': '-', 'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+         'Y': '-.--', 'Z': '--..'}
+
+
+# Define a function to convert user input into Morse code and blink the LEDs accordingly
+def convert():
+    input_text = user_input.get()  # Get user input
+    print("Input: " + input_text)
+    for letter in input_text:
+        for symbol in MORSE.get(letter.upper(), ' '):
+            if symbol == '.':
+                dot()
+            elif symbol == '-':
+                dash()
+            else:
+                time.sleep(0.5)
+    print("Morse Code Blinked Successfully!")
+    # Blink the red LED after blinking the Morse code
+    GPIO.output(12, GPIO.HIGH)
+    time.sleep(2)
+    GPIO.output(12, GPIO.LOW)
+
+# Create a user input box
+user_input = tk.Entry(win, font=myFont, width=24, bg='white')
+user_input.grid(row=0, column=0)
+
+# Create a button for the convert command
+button = tk.Button(win, text='Convert', font=myFont, command=convert, bg='grey', height=1, width=10)
+button.grid(row=1, column=0)
+
+# Run the tkinter main loop
+win.mainloop()
